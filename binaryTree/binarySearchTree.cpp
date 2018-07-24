@@ -15,21 +15,11 @@ class BinarySearchTree {
         delete node;
     }
 
-    bool insert(const T& data, Node* node) {
-        if (data < node->data) {
-            if (node->left) {
-                return insert(data, node->left);
-            }
-            node->left = new Node(data);
-            return true;
-        } else if (node->data < data) {
-            if (node->rigth) {
-                return insert(data, node->rigth);
-            }
-            node->rigth = new Node(data);
-            return true;
-        }
-        return false;
+    Node* insert(const T& data, Node* node) {
+        if (!node) return new Node(data);
+        if (data < node->data) node->left = insert(data, node->left);
+        else if (node->data < data) node->rigth = insert(data, node->rigth);
+        return node;
     }
 
     Node* find(const T& data, Node* node) {
@@ -46,18 +36,38 @@ class BinarySearchTree {
         std::cout << node->data << " ";
     }
 
-    Node* findRigthMostChildren(Node* node) {
+    Node* findMin(Node* node) {
         while(node->rigth) {
             node = node->rigth;
         }
         return node; 
     }
 
-    void remove(Node* node) {
-        if (!node->left && !node->rigth) delete node;
-        Node* newValue = node->left ? findRigthMostChildren(node->left) : node->rigth;
-        node->data = newValue->data;
-        remove(newValue);
+    Node* remove(const T& data, Node* node) {
+        if (!node) return nullptr;
+        if (node->data < data) node->rigth = remove(data, node->rigth);
+        else if (data < node->data) node->left = remove(data, node->left);
+        else {
+            // Found node to be removed
+            if (!node->left && !node->rigth) {
+                delete node;
+                return nullptr;
+            }
+            if (!node->left) {
+                Node* tmp = node;
+                node = tmp->rigth;
+                delete tmp;
+            } else if (!node->rigth) {
+                Node* tmp = node;
+                node = tmp->left;
+                delete tmp;
+            } else {
+                Node* min = findMin(node->rigth);
+                node->data = min->data;
+                node->right = remove(min->data, min);
+            }
+        }
+        return node;
     }
 
   public:
@@ -69,13 +79,12 @@ class BinarySearchTree {
     }
 
     // Future: return iterator
-    bool insert(const T& data) {
+    void insert(const T& data) {
         if (!m_root) {
             Node* n = new Node(data);
             m_root = n;
-            return true;
         } 
-        return insert(data, m_root);
+        insert(data, m_root);
     }
 
     // Future: return iterator
@@ -90,11 +99,8 @@ class BinarySearchTree {
         }
     }
 
-    bool remove(const T& data) {
-        Node* node = find(data, m_root);
-        if (!node) return false;
-        remove(node);
-        return true;
+    void remove(const T& data) {
+        remove(data, m_root);
     }
 
   private:
