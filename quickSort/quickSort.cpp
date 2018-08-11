@@ -24,7 +24,7 @@ quickSort(std::vector<int>& arr, int begin, int end) {
         // (which means the element is already in the rigth place)
         // or until it reaches the boundarie
         while ((rigth >=0) && arr[rigth] > arr[pivot]) { --rigth; };
-        std::cout << "left is: " << left << " - rigth is: " << rigth << std::endl;
+        //std::cout << "left is: " << left << " - rigth is: " << rigth << std::endl;
         if (left < rigth) {
             // Exchange the elemets and increment left and decrement rigth
             std::swap(arr[left++], arr[rigth--]);
